@@ -6,17 +6,38 @@ function SignIn() {
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const validEmail = 'admin@example.com';
-    const validPassword = 'password123';
+  
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        // Simpan token jika perlu
+        localStorage.setItem('token', data.token);
+        console.log('Token:', data.token);
+        // Menyimpan token setelah login
+        localStorage.setItem('token', data.token);
 
-    if (email === validEmail && password === validPassword) {
-      navigate('/invoice');
-    } else {
-      alert('Email atau password salah!');
+        // Navigasi ke halaman invoice
+        navigate('/invoice');
+      } else {
+        alert(data.message || 'Login gagal!');
+      }
+    } catch (err) {
+      alert('Terjadi kesalahan pada server.');
+      console.error(err);
     }
+    
+
   };
+  
 
   return (
     <div className="container-fluid vh-100 d-flex p-0">

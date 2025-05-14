@@ -5,20 +5,39 @@ function History() {
   const [invoices, setInvoices] = useState([]);
 
   useEffect(() => {
-    const data = [
-      { number: "INV001", date: "2022-01-01", total: "1000", status: "Paid", action: "View" },
-      { number: "INV002", date: "2022-02-01", total: "2000", status: "Pending", action: "View" },
-      { number: "INV003", date: "2022-03-01", total: "3000", status: "Paid", action: "View" },
-    ];
-    setInvoices(data);
+    const fetchInvoices = async () => {
+      try {
+        const token = localStorage.getItem("token");
+
+        const response = await fetch("http://localhost:5000/api/invoices", {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+          },
+        });
+
+        const data = await response.json();
+        console.log("Fetched invoices:", data); // Untuk debug
+        setInvoices(data);
+      } catch (error) {
+        console.error("Gagal mengambil data invoice:", error);
+      }
+    };
+
+    fetchInvoices();
   }, []);
 
   return (
     <div className="container mt-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2>Invoice History</h2>
-        <button className="btn btn-primary" onClick={() => window.location.href='/invoice'}>Create New Invoice</button>
+        <button
+          className="btn btn-primary"
+          onClick={() => (window.location.href = "/invoice")}
+        >
+          Create New Invoice
+        </button>
       </div>
+
       <div className="card shadow-sm">
         <div className="card-body">
           <div className="table-responsive">
@@ -33,15 +52,35 @@ function History() {
                 </tr>
               </thead>
               <tbody>
-                {invoices.map((invoice, index) => (
-                  <tr key={index}>
-                    <td>{invoice.number}</td>
-                    <td>{invoice.date}</td>
-                    <td>{invoice.total}</td>
-                    <td>{invoice.status}</td>
-                    <td>{invoice.action}</td>
+                {invoices.length === 0 ? (
+                  <tr>
+                    <td colSpan="5" className="text-center">
+                      Tidak ada data invoice.
+                    </td>
                   </tr>
-                ))}
+                ) : (
+                  invoices.map((invoice, index) => (
+                    <tr key={index}>
+                      <td>{invoice.invoice_number}</td>
+                      <td>{new Date(invoice.date).toLocaleDateString()}</td>
+                      <td>
+                        {parseFloat(invoice.total_amount).toLocaleString("id-ID", {
+                          style: "currency",
+                          currency: "IDR",
+                        })}
+                      </td>
+                      <td>{invoice.status || "N/A"}</td>
+                      <td>
+                        <button
+                          className="btn btn-sm btn-outline-primary"
+                          onClick={() => window.location.href = `/invoice/${invoice.id}`}
+                        >
+                          View
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
