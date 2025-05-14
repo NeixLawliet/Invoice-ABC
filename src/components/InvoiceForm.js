@@ -40,7 +40,33 @@ function InvoiceForm({ contentRef }) {
     return symbols[code] || code;
   };
 
+<<<<<<< HEAD
   // Handle file upload for logo
+=======
+  const handleSubmit = () => {
+  
+    if (items.length === 0 || subtotal === 0) {
+      alert("Harap isi item dan pastikan subtotal tidak nol.");
+      return;
+    }
+  
+    const invoiceData = {
+      logo,
+      items,
+      discount,
+      currency,
+      subtotal,
+      total,
+      invoiceDate,
+      dueDate,
+    };
+  
+    console.log("Invoice submitted:", invoiceData);
+    alert("Invoice submitted!");
+    
+  };
+
+>>>>>>> 3df21362ee8ccaf5316f4a024b775c9950f7b14e
   const handleLogoUpload = (e) => {
     const file = e.target.files[0];
     if (file && file.size <= 2 * 1024 * 1024) { // Maksimum 2MB
@@ -335,7 +361,95 @@ function InvoiceForm({ contentRef }) {
               Submit Invoice
             </button>
           </div>
+<<<<<<< HEAD
         </form>
+=======
+          <div className="col-md-6">
+            <div className="d-flex justify-content-between mb-2">
+              <span>Subtotal</span>
+              <span>
+                {getCurrencySymbol(currency)} {subtotal.toLocaleString()}
+              </span>
+            </div>
+
+            <div className="d-flex justify-content-between mb-2">
+              <span>Total</span>
+              <span>
+                {getCurrencySymbol(currency)} {total.toLocaleString()}
+              </span>
+            </div>
+
+            <div className="d-flex justify-content-between align-items-center mb-2">
+              <span>Diskon</span>
+              <div className="input-group" style={{ width: "150px" }}>
+                <input
+                  type="number"
+                  className="form-control"
+                  value={discount}
+                  onChange={(e) => {
+                    const discountPercent = Number(e.target.value);
+                    setDiscount(discountPercent);
+                  }}
+                  min="0"
+                  max="100"
+                />
+                <span className="input-group-text">%</span>
+              </div>
+            </div>
+
+            <div className="d-flex justify-content-between align-items-center mb-2">
+              <span>Amount Paid</span>
+              <div className="input-group" style={{ width: "150px" }}>
+                <span className="input-group-text">{getCurrencySymbol(currency)}</span>
+                <input type="number" className="form-control" defaultValue={0} />
+              </div>
+            </div>
+
+            <div className="d-flex justify-content-between">
+              <span>Balance Due</span>
+              <span>
+                {getCurrencySymbol(currency)} {total.toLocaleString()}
+              </span>
+            </div>
+          </div>
+          <div className="d-flex justify-content-end">
+            <button
+               className="btn btn-primary w-25 mt-2"
+               onClick={handleSubmit}
+                >
+                  Submit
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div
+        className="d-flex flex-column align-items-start mt-5 me-3"
+        style={{ width: "200px" }}
+      >
+        <button className="btn btn-success w-100 mb-2" onClick={handleDownload}>
+          Download
+        </button>
+
+        <select
+          className="form-select mb-2"
+          value={currency}
+          onChange={(e) => setCurrency(e.target.value)}
+        >
+          <option value="IDR">IDR (Rp)</option>
+          <option value="USD">USD ($)</option>
+          <option value="EUR">EUR (€)</option>
+          <option value="GBP">GBP (£)</option>
+          <option value="CAD">CAD ($)</option>
+          <option value="AUD">AUD ($)</option>
+          <option value="JPY">JPY (¥)</option>
+          <option value="CNY">CNY (¥)</option>
+        </select>
+
+        <a href="#" className="text-success text-center w-100">
+          Save Default
+        </a>
+>>>>>>> 3df21362ee8ccaf5316f4a024b775c9950f7b14e
       </div>
     </div>
   );

@@ -25,6 +25,7 @@ function SignIn() {
         // Menyimpan token setelah login
         localStorage.setItem('token', data.token);
 
+<<<<<<< HEAD
         // Navigasi ke halaman invoice
         navigate('/invoice');
       } else {
@@ -33,6 +34,13 @@ function SignIn() {
     } catch (err) {
       alert('Terjadi kesalahan pada server.');
       console.error(err);
+=======
+    if (email === validEmail && password === validPassword) {
+      localStorage.setItem('isLoggedIn', 'true'); // Simpan status login
+      navigate('/invoice'); // Redirect ke halaman invoice
+    } else {
+      alert('Email atau password salah!');
+>>>>>>> 3df21362ee8ccaf5316f4a024b775c9950f7b14e
     }
     
 
@@ -43,7 +51,6 @@ function SignIn() {
     <div className="container-fluid vh-100 d-flex p-0">
       <div className="col-md-6 d-flex flex-column justify-content-center align-items-start px-5">
         <img src="/logo abc 1.png" alt="Logo" style={{ width: 220, marginBottom: '2rem' }} />
-
         <h4 className="mb-2">Welcome To</h4>
         <h2 className="mb-4 fw-bold" style={{ color: '#3f0147' }}>INVOICE ABC</h2>
 
@@ -70,9 +77,11 @@ function SignIn() {
               style={{ backgroundColor: 'transparent' }}
             />
           </div>
+
           <button type="submit" className="btn w-100 text-white fw-bold" style={{ backgroundColor: '#8e24aa' }}>
             SIGN IN
           </button>
+
           <p className="mt-3 text-center">
             Don't have account? <a href="/register" style={{ textDecoration: 'underline', color: '#8e24aa' }}>Register</a>
           </p>
@@ -83,9 +92,7 @@ function SignIn() {
         </div>
       </div>
 
-      <div
-        className="col-md-6 d-none d-md-flex justify-content-center align-items-center"
-      >
+      <div className="col-md-6 d-none d-md-flex justify-content-center align-items-center">
         <img src="/gambar.png" alt="Login Illustration" style={{ maxWidth: '100%' }} />
       </div>
     </div>

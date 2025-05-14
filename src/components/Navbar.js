@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { FaLanguage, FaSun, FaMoon } from 'react-icons/fa';
@@ -7,7 +7,13 @@ function Navbar() {
     const [darkMode, setDarkMode] = useState(false);
     const [selectedLanguage, setSelectedLanguage] = useState('en');
     const [showLanguageMenu, setShowLanguageMenu] = useState(false);
-    const navigate = useNavigate(); // 🚀 Tambahkan ini
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const navigate = useNavigate(); 
+
+    useEffect(() => {
+        const loginStatus = localStorage.getItem('isLoggedIn') === 'true';
+        setIsLoggedIn(loginStatus);
+    }, []);
 
     const handleToggle = () => {
         setDarkMode(!darkMode);
@@ -21,6 +27,12 @@ function Navbar() {
 
     const goToSignIn = () => {
         navigate('/signIn'); 
+    };
+
+    const handleLogout = () => {
+        localStorage.removeItem('isLoggedIn');
+        setIsLoggedIn(false);
+        navigate('/signIn'); // Redirect ke login lagi
     };
 
     return (
@@ -60,9 +72,16 @@ function Navbar() {
                     >
                         {darkMode ? <FaSun /> : <FaMoon />}
                     </button>
-                    <button className="btn btn-light btn-sm rounded-3 px-4" onClick={goToSignIn}>
-                        Sign In
-                    </button>
+
+                    {isLoggedIn ? (
+                        <button className="btn btn-danger btn-sm rounded-3 px-4" onClick={handleLogout}>
+                            Logout
+                        </button>
+                    ) : (
+                        <button className="btn btn-light btn-sm rounded-3 px-4" onClick={goToSignIn}>
+                            Sign In
+                        </button>
+                    )}
                 </div>
             </div>
         </nav>
