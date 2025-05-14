@@ -40,33 +40,6 @@ function InvoiceForm({ contentRef }) {
     return symbols[code] || code;
   };
 
-<<<<<<< HEAD
-  // Handle file upload for logo
-=======
-  const handleSubmit = () => {
-  
-    if (items.length === 0 || subtotal === 0) {
-      alert("Harap isi item dan pastikan subtotal tidak nol.");
-      return;
-    }
-  
-    const invoiceData = {
-      logo,
-      items,
-      discount,
-      currency,
-      subtotal,
-      total,
-      invoiceDate,
-      dueDate,
-    };
-  
-    console.log("Invoice submitted:", invoiceData);
-    alert("Invoice submitted!");
-    
-  };
-
->>>>>>> 3df21362ee8ccaf5316f4a024b775c9950f7b14e
   const handleLogoUpload = (e) => {
     const file = e.target.files[0];
     if (file && file.size <= 2 * 1024 * 1024) { // Maksimum 2MB
@@ -110,6 +83,11 @@ function InvoiceForm({ contentRef }) {
   const handleSubmit = async (e) => {
     e.preventDefault(); // Mencegah reload halaman saat form disubmit
 
+    if (items.length === 0 || subtotal === 0) {
+      alert("Harap isi item dan pastikan subtotal tidak nol.");
+      return;
+    }
+
     const payload = {
       invoice_number: invoiceNumber,
       date: invoiceDate ? invoiceDate.toISOString().split("T")[0] : null,
@@ -130,9 +108,6 @@ function InvoiceForm({ contentRef }) {
 
     // Tampilkan payload di console untuk debug
     console.log("Payload yang akan dikirim:", payload);
-
-    // Ambil token dari localStorage
-    const token = localStorage.getItem('token');
 
     try {
       const response = await fetch("http://localhost:5000/api/invoices", {
@@ -337,6 +312,7 @@ function InvoiceForm({ contentRef }) {
                       {calculateAmount(item.quantity, item.rate).toLocaleString()}
                     </span>
                     <button
+                      type="button"
                       className="btn btn-sm btn-danger ms-2"
                       onClick={() => handleRemoveItem(index)}
                     >
@@ -349,6 +325,7 @@ function InvoiceForm({ contentRef }) {
           </table>
 
           <button
+            type="button"
             className="btn btn-outline-primary mb-3"
             style={{ borderColor: "#a000c8", color: "#a000c8" }}
             onClick={handleAddItem}
@@ -356,15 +333,7 @@ function InvoiceForm({ contentRef }) {
             + Line Item
           </button>
 
-          <div className="d-flex justify-content-end mt-3">
-            <button type="submit" className="btn btn-primary">
-              Submit Invoice
-            </button>
-          </div>
-<<<<<<< HEAD
-        </form>
-=======
-          <div className="col-md-6">
+          <div className="col-md-6 ms-auto">
             <div className="d-flex justify-content-between mb-2">
               <span>Subtotal</span>
               <span>
@@ -412,22 +381,24 @@ function InvoiceForm({ contentRef }) {
               </span>
             </div>
           </div>
-          <div className="d-flex justify-content-end">
-            <button
-               className="btn btn-primary w-25 mt-2"
-               onClick={handleSubmit}
-                >
-                  Submit
+
+          <div className="d-flex justify-content-end mt-3">
+            <button type="submit" className="btn btn-primary">
+              Submit Invoice
             </button>
           </div>
-        </div>
+        </form>
       </div>
 
       <div
         className="d-flex flex-column align-items-start mt-5 me-3"
         style={{ width: "200px" }}
       >
-        <button className="btn btn-success w-100 mb-2" onClick={handleDownload}>
+        <button 
+          type="button"
+          className="btn btn-success w-100 mb-2" 
+          onClick={handleDownload}
+        >
           Download
         </button>
 
@@ -449,7 +420,6 @@ function InvoiceForm({ contentRef }) {
         <a href="#" className="text-success text-center w-100">
           Save Default
         </a>
->>>>>>> 3df21362ee8ccaf5316f4a024b775c9950f7b14e
       </div>
     </div>
   );

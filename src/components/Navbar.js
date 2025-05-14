@@ -10,9 +10,19 @@ function Navbar() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const navigate = useNavigate(); 
 
-    useEffect(() => {
+    const updateLoginStatus = () => {
         const loginStatus = localStorage.getItem('isLoggedIn') === 'true';
         setIsLoggedIn(loginStatus);
+    };
+
+    useEffect(() => {
+        updateLoginStatus();
+
+        // Dengarkan event penyimpanan lokal
+        window.addEventListener('storage', updateLoginStatus);
+        return () => {
+            window.removeEventListener('storage', updateLoginStatus);
+        };
     }, []);
 
     const handleToggle = () => {
@@ -32,7 +42,7 @@ function Navbar() {
     const handleLogout = () => {
         localStorage.removeItem('isLoggedIn');
         setIsLoggedIn(false);
-        navigate('/signIn'); // Redirect ke login lagi
+        navigate('/signIn');
     };
 
     return (

@@ -19,14 +19,12 @@ function SignIn() {
       const data = await response.json();
   
       if (response.ok) {
-        // Simpan token jika perlu
+        // Simpan token dan status login
         localStorage.setItem('token', data.token);
-        console.log('Token:', data.token);
-        // Menyimpan token setelah login
-        localStorage.setItem('token', data.token);
+        localStorage.setItem('isLoggedIn', 'true'); // ⬅️ Tambahan penting
+        window.dispatchEvent(new Event('storage')); // ⬅️ Biar Navbar tahu login berubah
 
-<<<<<<< HEAD
-        // Navigasi ke halaman invoice
+        console.log('Token:', data.token);
         navigate('/invoice');
       } else {
         alert(data.message || 'Login gagal!');
@@ -34,18 +32,8 @@ function SignIn() {
     } catch (err) {
       alert('Terjadi kesalahan pada server.');
       console.error(err);
-=======
-    if (email === validEmail && password === validPassword) {
-      localStorage.setItem('isLoggedIn', 'true'); // Simpan status login
-      navigate('/invoice'); // Redirect ke halaman invoice
-    } else {
-      alert('Email atau password salah!');
->>>>>>> 3df21362ee8ccaf5316f4a024b775c9950f7b14e
     }
-    
-
   };
-  
 
   return (
     <div className="container-fluid vh-100 d-flex p-0">
