@@ -25,6 +25,7 @@ function InvoiceForm({ contentRef }) {
   const [poNumber, setPoNumber] = useState('');
   const [paymentTerms, setPaymentTerms] = useState('');
   const [notes, setNotes] = useState('');
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const getCurrencySymbol = (code) => {
     const symbols = {
@@ -88,6 +89,10 @@ function InvoiceForm({ contentRef }) {
       return;
     }
 
+    setShowConfirmModal(true);
+  };
+
+  const handleConfirmSubmit = async () => {
     const payload = {
       invoice_number: invoiceNumber,
       date: invoiceDate ? invoiceDate.toISOString().split("T")[0] : null,
@@ -105,9 +110,6 @@ function InvoiceForm({ contentRef }) {
         amount: item.quantity * item.rate
       }))
     };
-
-    // Tampilkan payload di console untuk debug
-    console.log("Payload yang akan dikirim:", payload);
 
     try {
       const response = await fetch("http://localhost:5000/api/invoices", {
@@ -139,6 +141,7 @@ function InvoiceForm({ contentRef }) {
       console.error("Gagal mengirim data:", err);
       alert('Terjadi kesalahan saat mengirim data ke server.');
     }
+    setShowConfirmModal(false);
   };
 
   // Handle PDF download
@@ -421,6 +424,98 @@ function InvoiceForm({ contentRef }) {
           Save Default
         </a>
       </div>
+
+      {/* Modal Konfirmasi Submit */}
+      {showConfirmModal && (
+        <div className="modal show d-block" style={{backgroundColor: 'rgba(0,0,0,0.5)'}}>
+          <div className="modal-dialog modal-dialog-centered modal-lg">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Konfirmasi Invoice</h5>
+                <button type="button" className="btn-close" onClick={() => setShowConfirmModal(false)}></button>
+              </div>
+              <div className="modal-body">
+                <h6>Detail Invoice:</h6>
+                <table className="table">
+                  <tbody>
+                    <tr>
+                      <td>Invoice Number:</td>
+                      <td>{invoiceNumber}</td>
+                    </tr>
+                    <tr>
+                      <td>Bill To:</td>
+                      <td>{billTo}</td>
+                    </tr>
+                    <tr>
+                      <td>Ship To:</td>
+                      <td>{shipTo}</td>
+                    </tr>
+                    <tr>
+                      <td>Date:</td>
+                      <td>{invoiceDate ? invoiceDate.toLocaleDateString() : '-'}</td>
+                    </tr>
+                    <tr>
+                      <td>Due Date:</td>
+                      <td>{dueDate ? dueDate.toLocaleDateString() : '-'}</td>
+                    </tr>
+                    <tr>
+                      <td>Payment Terms:</td>
+                      <td>{paymentTerms}</td>
+                    </tr>
+                    <tr>
+                      <td>PO Number:</td>
+                      <td>{poNumber}</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <h6>Items:</h6>
+                <table className="table">
+                  <thead>
+                    <tr>
+                      <th>Description</th>
+                      <th>Quantity</th>
+                      <th>Rate</th>
+                      <th>Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {items.map((item, index) => (
+                      <tr key={index}>
+                        <td>{item.description}</td>
+                        <td>{item.quantity}</td>
+                        <td>{getCurrencySymbol(currency)} {item.rate.toLocaleString()}</td>
+                        <td>{getCurrencySymbol(currency)} {calculateAmount(item.quantity, item.rate).toLocaleString()}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+
+                <div className="row">
+                  <div className="col-md-6 ms-auto">
+                    <div className="d-flex justify-content-between">
+                      <strong>Subtotal:</strong>
+                      <span>{getCurrencySymbol(currency)} {subtotal.toLocaleString()}</span>
+                    </div>
+                    <div className="d-flex justify-content-between">
+                      <strong>Discount ({discount}%):</strong>
+                      <span>{getCurrencySymbol(currency)} {discountAmount.toLocaleString()}</span>
+                    </div>
+                    <div className="d-flex justify-content-between">
+                      <strong>Total:</strong>
+                      <span>{getCurrencySymbol(currency)} {total.toLocaleString()}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" onClick={() => setShowConfirmModal(false)}>Cancel</button>
+                <button type="button" className="btn btn-primary" onClick={handleConfirmSubmit}>Confirm Submit</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

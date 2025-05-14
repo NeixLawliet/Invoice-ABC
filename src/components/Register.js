@@ -6,18 +6,39 @@ function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
 
-    if (password !== confirmPassword) {
-      alert('Password tidak cocok!');
-      return;
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          confirmPassword
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message);
+      }
+
+      alert('Pendaftaran berhasil!');
+      navigate('/signin');
+      
+    } catch (err) {
+      setError(err.message);
+      alert(err.message);
     }
-
-    alert('Pendaftaran berhasil!');
-    navigate('/');
   };
 
   return (

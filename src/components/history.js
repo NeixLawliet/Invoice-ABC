@@ -5,26 +5,50 @@ function History() {
   const [invoices, setInvoices] = useState([]);
 
   useEffect(() => {
-    const fetchInvoices = async () => {
+    fetchInvoices();
+  }, []);
+
+  const fetchInvoices = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await fetch("http://localhost:5000/api/invoices", {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+      console.log("Fetched invoices:", data); // Untuk debug
+      setInvoices(data);
+    } catch (error) {
+      console.error("Gagal mengambil data invoice:", error);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm("Apakah Anda yakin ingin menghapus invoice ini?")) {
       try {
         const token = localStorage.getItem("token");
-
-        const response = await fetch("http://localhost:5000/api/invoices", {
+        const response = await fetch(`http://localhost:5000/api/invoices/${id}`, {
+          method: "DELETE",
           headers: {
             "Authorization": `Bearer ${token}`,
           },
         });
 
-        const data = await response.json();
-        console.log("Fetched invoices:", data); // Untuk debug
-        setInvoices(data);
+        if (response.ok) {
+          alert("Invoice berhasil dihapus");
+          fetchInvoices(); // Refresh data setelah menghapus
+        } else {
+          alert("Gagal menghapus invoice");
+        }
       } catch (error) {
-        console.error("Gagal mengambil data invoice:", error);
+        console.error("Error menghapus invoice:", error);
+        alert("Terjadi kesalahan saat menghapus invoice");
       }
-    };
-
-    fetchInvoices();
-  }, []);
+    }
+  };
 
   return (
     <div className="container mt-4">
@@ -71,12 +95,20 @@ function History() {
                       </td>
                       <td>{invoice.status || "N/A"}</td>
                       <td>
-                        <button
-                          className="btn btn-sm btn-outline-primary"
-                          onClick={() => window.location.href = `/invoice/${invoice.id}`}
-                        >
-                          View
-                        </button>
+                        <div className="btn-group">
+                          <button
+                            className="btn btn-sm btn-outline-primary me-2"
+                            onClick={() => window.location.href = `/invoice/${invoice.id}`}
+                          >
+                            View
+                          </button>
+                          <button
+                            className="btn btn-sm btn-outline-danger"
+                            onClick={() => handleDelete(invoice.id)}
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))
