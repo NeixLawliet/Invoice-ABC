@@ -28,6 +28,29 @@ function InvoiceForm({ contentRef }) {
     return symbols[code] || code;
   };
 
+  const handleSubmit = () => {
+  
+    if (items.length === 0 || subtotal === 0) {
+      alert("Harap isi item dan pastikan subtotal tidak nol.");
+      return;
+    }
+  
+    const invoiceData = {
+      logo,
+      items,
+      discount,
+      currency,
+      subtotal,
+      total,
+      invoiceDate,
+      dueDate,
+    };
+  
+    console.log("Invoice submitted:", invoiceData);
+    alert("Invoice submitted!");
+    
+  };
+
   const handleLogoUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -289,6 +312,14 @@ function InvoiceForm({ contentRef }) {
                 {getCurrencySymbol(currency)} {total.toLocaleString()}
               </span>
             </div>
+          </div>
+          <div className="d-flex justify-content-end">
+            <button
+               className="btn btn-primary w-25 mt-2"
+               onClick={handleSubmit}
+                >
+                  Submit
+            </button>
           </div>
         </div>
       </div>
