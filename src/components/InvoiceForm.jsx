@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
@@ -21,6 +21,7 @@ function InvoiceForm({ contentRef }) {
 
   const [invoiceNumber, setInvoiceNumber] = useState('');
   const [billTo, setBillTo] = useState('');
+  const [from, setFrom] = useState('');
   const [shipTo, setShipTo] = useState('');
   const [poNumber, setPoNumber] = useState('');
   const [paymentTerms, setPaymentTerms] = useState('');
@@ -99,6 +100,7 @@ function InvoiceForm({ contentRef }) {
       payment_terms: paymentTerms,
       due_date: dueDate ? dueDate.toISOString().split("T")[0] : null,
       po_number: poNumber,
+      from: from,
       bill_to: billTo,
       ship_to: shipTo,
       total_amount: total,
@@ -112,7 +114,7 @@ function InvoiceForm({ contentRef }) {
     };
 
     try {
-      const response = await fetch("http://localhost:5000/api/invoices", {
+      const response = await fetch("http://192.168.100.72:5000/api/invoices", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -157,6 +159,28 @@ function InvoiceForm({ contentRef }) {
     });
   };
 
+  useEffect(() => {
+    const savedDefaults = JSON.parse(localStorage.getItem("invoiceDefaults"));
+    if (savedDefaults) {
+      setFrom(savedDefaults.from || "");
+      setBillTo(savedDefaults.billTo || "");
+      setCurrency(savedDefaults.currency || "IDR");
+      setDiscount(savedDefaults.discount || 0);
+    }
+  }, []);
+
+  const handleSaveDefault = () => {
+    const defaults = {
+      from,
+      billTo,
+      currency,
+      discount,
+    };
+    localStorage.setItem("invoiceDefaults", JSON.stringify(defaults));
+    alert("Data default berhasil disimpan.");
+  };
+  
+
   return (
     <div className="d-flex" style={{ gap: "15px" }}>
       <div ref={contentRef} className="container border mt-3 p-4" style={{ flex: 1 }}>
@@ -188,11 +212,11 @@ function InvoiceForm({ contentRef }) {
                 type="text"
                 className="form-control mt-2"
                 placeholder="Who is this from?"
-                value={billTo}
-                onChange={(e) => setBillTo(e.target.value)}
+                value={from}
+                onChange={(e) => setFrom(e.target.value)}
               />
             </div>
-            <div className="col-md-6" style={{ width: '300px', marginLeft: 'auto' }}>
+            <div className="col-md-6" style={{ width: '50%', marginLeft: 'auto' }}>
               <h2 className="fw-bold text-end">INVOICE</h2>
               <div className="input-group mb-3" style={{ width: '200px', marginLeft: 'auto' }}>
                 <span className="input-group-text">#</span>
@@ -204,7 +228,7 @@ function InvoiceForm({ contentRef }) {
                 />
               </div>
               <div className="d-flex flex-column gap-2 mt-5 pt-5">
-                <div className="d-flex justify-content-between align-items-center" style={{ width: '230px', marginLeft: 'auto' }}>
+                <div className="d-flex justify-content-between align-items-center" style={{ width: '100%', marginLeft: 'auto' }}>
                   <label className="me-3 text-end ms-auto">Date</label>
                   <DatePicker
                     selected={invoiceDate}
@@ -212,7 +236,7 @@ function InvoiceForm({ contentRef }) {
                     className="form-control"
                     dateFormat="dd/MM/yyyy"
                     placeholderText="Select date"
-                    style={{ width: '180px' }}
+                    style={{ width: '100%' }}
                   />
                 </div>
                 <div className="d-flex justify-content-between align-items-center">
@@ -222,18 +246,18 @@ function InvoiceForm({ contentRef }) {
                     className="form-control"
                     value={paymentTerms}
                     onChange={(e) => setPaymentTerms(e.target.value)}
-                    style={{ width: '180px' }}
+                    style={{ width: '205px' }}
                   />
                 </div>
-                <div className="d-flex justify-content-between align-items-center" style={{ width: '255px', marginLeft: 'auto' }}>
-                  <label className="me-3 text-end ms-auto">Due Date</label>
+                <div className="d-flex justify-content-between align-items-center">
+                  <label className="me-3 text-end ms-auto" >Due Date</label>
                   <DatePicker
                     selected={dueDate}
                     onChange={(date) => setDueDate(date)}
                     className="form-control"
                     dateFormat="dd/MM/yyyy"
                     placeholderText="Select due date"
-                    style={{ width: '180px' }}
+                    style={{ width: '100%' }}
                   />
                 </div>
                 <div className="d-flex justify-content-between align-items-center">
@@ -243,7 +267,7 @@ function InvoiceForm({ contentRef }) {
                     className="form-control"
                     value={poNumber}
                     onChange={(e) => setPoNumber(e.target.value)}
-                    style={{ width: '180px' }}
+                    style={{ width: '205px' }}
                   />
                 </div>
               </div>
@@ -251,7 +275,19 @@ function InvoiceForm({ contentRef }) {
           </div>
 
           <div className="row mb-3">
-            <div className="col-md-6">
+
+          <div className="col-md-4">
+              <label>Bill To</label>
+              <input
+                type="text"
+                className="form-control"
+                value={billTo}
+                onChange={(e) => setBillTo(e.target.value)}
+                placeholder=""
+              />
+            </div>
+
+            <div className="col-md-4">
               <label>Ship To</label>
               <input
                 type="text"
@@ -420,9 +456,14 @@ function InvoiceForm({ contentRef }) {
           <option value="CNY">CNY (¥)</option>
         </select>
 
-        <a href="#" className="text-success text-center w-100">
+        <button 
+          type="button"
+          className="btn btn-success w-100"
+          onClick={handleSaveDefault}
+        >
           Save Default
-        </a>
+        </button>
+
       </div>
 
       {/* Modal Konfirmasi Submit */}
