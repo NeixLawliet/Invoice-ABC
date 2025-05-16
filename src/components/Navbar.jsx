@@ -26,7 +26,7 @@ function Navbar() {
             localStorage.removeItem('token');
             localStorage.removeItem('isLoggedIn');
     
-            await fetch('http://localhost:5000/api/auth/logout', {
+            await fetch('http://192.168.100.72:5000/api/auth/logout', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -11,7 +11,8 @@ import Help from './components/Help';
 import Information from './components/Information';
 import Register from './components/Register';
 import Sidebar from './components/sidebar';         // Tambahkan Sidebar
-import Dashboard from './components/Dashboard';     // Tambahkan Dashboard
+import Dashboard from './components/Dashboard'; 
+import Customer from './components/Customer';    
 
 function AppContent() {
   const invoiceRef = useRef(null);
@@ -21,7 +22,7 @@ function AppContent() {
   const currentPath = location.pathname.toLowerCase();
 
   // Halaman yang tidak memakai Navbar & Footer
-  const hideNavbarFooterRoutes = ['/signin', '/register', '/dashboard'];
+  const hideNavbarFooterRoutes = ['/signin', '/register', '/dashboard', '/customer'];
   const hideLayout = hideNavbarFooterRoutes.includes(currentPath);
 
   useEffect(() => {
@@ -37,6 +38,17 @@ function AppContent() {
       <div style={{ display: 'flex' }}>
         <Sidebar />
         <Dashboard />
+      </div>
+    );
+  }
+
+  if (currentPath === '/customer') {
+    return (
+      <div style={{ display: 'flex' }}>
+        <Sidebar />
+        <div style={{ marginLeft: '250px', padding: '20px', width: '100%' }}>
+          <Customer />
+        </div>
       </div>
     );
   }

@@ -18,7 +18,7 @@ const Sidebar = () => {
           <FaUsers /> Customer
         </Nav.Link>
         <Nav.Link href="/invoice" style={{ color: 'white' }}>
-          <FaPlus /> Crate Invoice
+          <FaPlus /> Create Invoice
         </Nav.Link>
       </Nav>
 
