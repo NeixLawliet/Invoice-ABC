@@ -6,31 +6,27 @@ const Customer = () => {
   const [customers, setCustomers] = useState([]);
 
   useEffect(() => {
-    axios.get('http://192.168.100.72:5000/api/invoices/customers') // Ganti dengan port backend kamu
-      .then(res => {
-        const today = new Date();
-
-        const updated = res.data.map((item, index) => {
-          const dueDate = new Date(item.due_date);
-          let status = 'Belum Lunas';
-
-          if (dueDate < today) {
-            status = 'Overdue';
-          }
-
-          return {
-            id: index + 1,
-            invoice: item.invoice_number,
-            nama: item.bill_to,
-            alamat: item.ship_to,
-            status: status
-          };
+    const fetchCustomers = async () => {
+      try {
+        const token = localStorage.getItem('token'); 
+        const response = await axios.get('http://192.168.100.72:5000/customers', {
+          headers: { Authorization: `Bearer ${token}` }
         });
+        setCustomers(response.data);
+      } catch (error) {
+        console.error('Gagal mengambil data customer:', error);
+      }
+    };
 
-        setCustomers(updated);
-      })
-      .catch(err => console.error(err));
+    fetchCustomers();
   }, []);
+
+  const updateStatus = (id, newStatus) => {
+    const updated = customers.map(customer =>
+      customer.id === id ? { ...customer, status: newStatus } : customer
+    );
+    setCustomers(updated);
+  };
 
   return (
     <div className="container mt-5">
@@ -47,16 +43,25 @@ const Customer = () => {
         <tbody>
           {customers.map((customer) => (
             <tr key={customer.id}>
-              <td>{customer.invoice}</td>
+              <td>{customer.invoice_number}</td>
               <td>{customer.nama}</td>
               <td>{customer.alamat}</td>
               <td>
-                <span className={`badge ${
-                  customer.status === 'Lunas' ? 'bg-success' :
-                  customer.status === 'Overdue' ? 'bg-warning' : 'bg-danger'
-                }`}>
-                  {customer.status}
-                </span>
+                <select
+                  className={`form-select ${
+                    customer.status === 'Lunas'
+                      ? 'bg-success text-white'
+                      : customer.status === 'Overdue'
+                      ? 'bg-warning text-dark'
+                      : 'bg-danger text-white'
+                  }`}
+                  value={customer.status}
+                  onChange={(e) => updateStatus(customer.id, e.target.value)}
+                >
+                  <option value="Lunas">Lunas</option>
+                  <option value="Belum Lunas">Belum Lunas</option>
+                  <option value="Overdue">Overdue</option>
+                </select>
               </td>
             </tr>
           ))}
