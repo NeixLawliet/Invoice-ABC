@@ -9,9 +9,9 @@ const Customer = () => {
     const fetchCustomers = async () => {
       try {
         const token = localStorage.getItem('token'); 
-        const response = await axios.get('http://192.168.100.72:5000/api/customer/customers', {
+        const response = await axios.get('http://192.168.100.72:5000/customers', {
           headers: { Authorization: `Bearer ${token}` }
-        });
+        });        
         setCustomers(response.data);
       } catch (error) {
         console.error('Gagal mengambil data customer:', error);
