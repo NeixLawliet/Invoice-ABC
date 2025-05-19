@@ -5,10 +5,12 @@
   import DatePicker from "react-datepicker";
   import "react-datepicker/dist/react-datepicker.css";
   import { useNavigate } from "react-router-dom";
+  import { useLanguage } from './LanguageContext';
 
 
   function InvoiceForm({ contentRef }) {
     const navigate = useNavigate();
+    const { language } = useLanguage();
 
     // State untuk form fields
     const [logo, setLogo] = useState(null);
@@ -198,7 +200,7 @@
                       style={{ maxHeight: "100%", maxWidth: "100%" }}
                     />
                   ) : (
-                    <span className="text-muted">+Add Your Logo</span>
+                    <span className="text-justify">+Add Your Logo</span>
                   )}
                   <input
                     type="file"
@@ -345,7 +347,7 @@
                         />
                       </div>
                     </td>
-                    <td className="d-flex justify-content-between align-items-center">
+                    <td>
                       <span>
                         {getCurrencySymbol(currency)}{" "}
                         {calculateAmount(item.quantity, item.rate).toLocaleString()}

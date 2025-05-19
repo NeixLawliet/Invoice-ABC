@@ -11,3 +11,39 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+body {
+  transition: background-color 0.5s ease, color 0.5s ease;
+  background-color: #ffffff;
+  color: #000000;
+}
+
+body.dark-mode {
+  background-color: #121212;
+  color: #ffffff;
+}
+
+.navbar {
+  transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+.dark-mode-navbar {
+  background-color: #222 !important;
+  color: white;
+  transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+.light-mode-navbar{
+  background-color: #3f0147 !important;
+  color: white;
+  transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+a, button, span, div, h1, h2, h3, h4, h5, h6 {
+  transition: color 0.5s ease, background-color 0.5s ease;
+}
+
+.text-white {
+  color: black;
+  transition: color 0.5s ease, background-color 0.5s ease;
+}

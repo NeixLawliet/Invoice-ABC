@@ -1,3 +1,4 @@
+// src/components/Dashboard.js
 import React, { useState } from 'react';
 import { Card, Row, Col, Table } from 'react-bootstrap';
 import { Bar, Line, Pie } from 'react-chartjs-2';
@@ -25,17 +26,19 @@ ChartJS.register(
 );
 
 const Dashboard = () => {
+  // Data KPI
   const kpiData = [
     { title: 'Total Invoice', value: 1200 },
-    { title: 'Total Pengguna Baru', value: 350 },
-    { title: 'Invoice Belum Bayar', value: 75 },
+    { title: 'Total New User', value: 350 },
+    { title: 'Unpaid Invoice', value: 75 },
   ];
 
+  // Data grafik contoh
   const barData = {
     labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'],
     datasets: [
       {
-        label: 'Invoice per Bulan',
+        label: 'Monthly Invoice',
         data: [100, 150, 120, 170, 160, 190],
         backgroundColor: 'rgba(75,192,192,0.6)',
       },
@@ -46,7 +49,7 @@ const Dashboard = () => {
     labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'],
     datasets: [
       {
-        label: 'Pengguna Baru',
+        label: 'New User',
         data: [20, 40, 35, 50, 45, 60],
         fill: false,
         borderColor: 'rgba(153,102,255,1)',
@@ -56,10 +59,10 @@ const Dashboard = () => {
   };
 
   const pieData = {
-    labels: ['Lunas', 'Belum Bayar'],
+    labels: ['Paid', 'Unpaid'],
     datasets: [
       {
-        label: 'Status Invoice',
+        label: 'Invoice Status',
         data: [1125, 75],
         backgroundColor: ['#36A2EB', '#FF6384'],
         hoverOffset: 4,
@@ -67,23 +70,14 @@ const Dashboard = () => {
     ],
   };
 
-  // Opsi chart agar responsive dan tidak mengunci rasio aspek
-  const chartOptions = {
-    maintainAspectRatio: false,
-    responsive: true,
-    plugins: {
-      legend: {
-        position: 'bottom',
-      },
-    },
-  };
-
+  // Data tabel
   const tableData = [
     { id: 1, customer: 'John Doe', invoice: 'INV-001', amount: 500, status: 'Lunas' },
     { id: 2, customer: 'Jane Smith', invoice: 'INV-002', amount: 300, status: 'Belum Bayar' },
     { id: 3, customer: 'Mark Johnson', invoice: 'INV-003', amount: 450, status: 'Lunas' },
   ];
 
+  // State untuk search
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredData, setFilteredData] = useState(tableData);
 
@@ -102,7 +96,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div style={{ marginLeft: '270px', padding: '20px' }}>
+     <div className="main-content">
       <h4>Dashboard</h4>
 
       {/* KPI Cards */}
@@ -119,14 +113,14 @@ const Dashboard = () => {
         ))}
       </Row>
 
-      {/* Grafik */}
+      {/* Charts */}
       <Row className="mb-4">
         <Col md={4}>
           <Card className="shadow-sm mb-3">
             <Card.Body>
-              <Card.Title>Invoice per Bulan</Card.Title>
+              <Card.Title>Monthly Invoice</Card.Title>
               <div style={{ height: '250px' }}>
-                <Bar data={barData} options={chartOptions} />
+                <Bar data={barData} options={{ maintainAspectRatio: false }} />
               </div>
             </Card.Body>
           </Card>
@@ -135,9 +129,9 @@ const Dashboard = () => {
         <Col md={4}>
           <Card className="shadow-sm mb-3">
             <Card.Body>
-              <Card.Title>Pengguna Baru per Bulan</Card.Title>
+              <Card.Title>New User Monthly</Card.Title>
               <div style={{ height: '250px' }}>
-                <Line data={lineData} options={chartOptions} />
+                <Line data={lineData} options={{ maintainAspectRatio: false }} />
               </div>
             </Card.Body>
           </Card>
@@ -146,25 +140,24 @@ const Dashboard = () => {
         <Col md={4}>
           <Card className="shadow-sm mb-3">
             <Card.Body>
-              <Card.Title>Status Invoice</Card.Title>
+              <Card.Title>Invoice Status</Card.Title>
               <div style={{ height: '250px' }}>
-                <Pie data={pieData} options={chartOptions} />
+                <Pie data={pieData} options={{ maintainAspectRatio: false }} />
               </div>
             </Card.Body>
           </Card>
         </Col>
       </Row>
 
-      {/* Tabel Data dengan Search */}
+      {/* Table */}
       <Card className="shadow-sm">
         <Card.Body>
           <Card.Title>Data Invoice</Card.Title>
-
           <div className="mb-3">
             <input
               type="text"
               className="form-control"
-              placeholder="Cari berdasarkan customer, invoice, atau status"
+              placeholder="Search by customer, invoice, or status"
               value={searchTerm}
               onChange={handleSearch}
             />

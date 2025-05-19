@@ -1,3 +1,4 @@
+/* ====== App.css ====== */
 .App {
   text-align: center;
 }
@@ -37,26 +38,7 @@
   }
 }
 
-body.dark-mode {
-  background-color: #121212; /* Warna latar belakang gelap */
-  color: white;              /* Warna teks jadi putih */
-}
+/* ====== DARK MODE SUPPORT ====== */
+/* src/App.css */
 
-body.dark-mode .navbar {
-  background-color: #222 !important;
-}
-
-body.dark-mode .dropdown-menu {
-  background-color: #333;
-  color: white;
-}
-
-body.dark-mode .dropdown-item {
-  color: white;
-}
-
-
-body.dark-mode .dropdown-item:hover {
-  background-color: #444;
-}
 

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+import { useLanguage } from './LanguageContext';
 
 
 
@@ -9,6 +10,34 @@ function History() {
   const [invoices, setInvoices] = useState([]);
   const [filteredInvoices, setFilteredInvoices] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const translations = {
+    en : {
+      invoiceHistory: 'Invoice History',
+      createNewInvoice: 'Create New Invoice',
+      searchCustomer: 'Search customer',
+      search: 'Search',
+      invoiceNumber: 'Invoice Number',
+      date: 'Date',
+      total: 'Total',
+      status: 'Status',
+      action: 'Action',
+      noInvoiceData: 'No invoice data.',
+      view: 'View',
+      delete: 'Delete',
+      download: 'Download',
+      sendToWhatsApp: 'Send to WhatsApp',
+      enterPhoneNumber: 'Enter phone number',
+      close: 'Close',
+      send: 'Send',
+      confirmDelete: 'Are you sure you want to delete this invoice?',
+      deleteSuccess: 'Invoice deleted successfully',
+      deleteFail: 'Failed to delete invoice',
+      deleteError: 'Error deleting invoice',
+      deleteErrorAlert: 'An error occurred while deleting the invoice'
+
+    }
+    
+  }
 
   useEffect(() => {
     fetchInvoices();

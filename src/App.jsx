@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useContext } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 
@@ -10,9 +10,11 @@ import SignIn from './components/SignIn';
 import Help from './components/Help';
 import Information from './components/Information';
 import Register from './components/Register';
-import Sidebar from './components/sidebar';         // Tambahkan Sidebar
+import Sidebar from './components/sidebar';         
 import Dashboard from './components/Dashboard'; 
-import Customer from './components/Customer';    
+import Customer from './components/Customer';   
+import { DarkModeProvider, DarkModeContext } from './components/DarkModeContext';
+import { LanguageProvider } from './components/LanguageContext';
 
 function AppContent() {
   const invoiceRef = useRef(null);
@@ -37,7 +39,9 @@ function AppContent() {
     return (
       <div style={{ display: 'flex' }}>
         <Sidebar />
-        <Dashboard />
+        <div style={{ marginLeft: '250px', padding: '20px', width: '100%' }}>   
+          <Dashboard />
+        </div>
       </div>
     );
   }
@@ -74,6 +78,16 @@ function AppContent() {
 }
 
 function App() {
+  const { darkMode } = useContext(DarkModeContext);
+
+  useEffect(() => {
+    if (darkMode) {
+      document.body.classList.add('dark-mode');
+    } else {
+      document.body.classList.remove('dark-mode');
+    }
+  }, [darkMode]);
+
   return (
     <Router>
       <AppContent />
@@ -81,4 +95,14 @@ function App() {
   );
 }
 
-export default App;
+export default function AppWrapper() {
+  return (
+    <DarkModeProvider>
+      <LanguageProvider>
+        <App />
+      </LanguageProvider>
+    </DarkModeProvider>
+  );
+}
+
+
