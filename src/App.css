@@ -38,6 +38,11 @@
   }
 }
 
+.custom-thead th {
+  background-color: #a000c8 !important;
+  color: white !important;
+}
+
 /* ====== DARK MODE SUPPORT ====== */
 /* src/App.css */
 

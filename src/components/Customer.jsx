@@ -9,7 +9,7 @@ const Customer = () => {
     const fetchCustomers = async () => {
       try {
         const token = localStorage.getItem('token'); 
-        const response = await axios.get('http://192.168.100.72:5000/customers', {
+        const response = await axios.get('http://192.168.100.72:5000/api/customer/customers', {
           headers: { Authorization: `Bearer ${token}` }
         });        
         setCustomers(response.data);
@@ -44,8 +44,8 @@ const Customer = () => {
           {customers.map((customer) => (
             <tr key={customer.id}>
               <td>{customer.invoice_number}</td>
-              <td>{customer.nama}</td>
-              <td>{customer.alamat}</td>
+              <td>{customer.name}</td>
+              <td>{customer.address}</td>
               <td>
                 <select
                   className={`form-select ${

@@ -1,6 +1,13 @@
 import React, { useRef, useEffect, useContext } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+  useNavigate,
+  Navigate
+} from 'react-router-dom';
 
 import Navbar from './components/Navbar';
 import InvoiceForm from './components/InvoiceForm';
@@ -10,9 +17,10 @@ import SignIn from './components/SignIn';
 import Help from './components/Help';
 import Information from './components/Information';
 import Register from './components/Register';
-import Sidebar from './components/sidebar';         
-import Dashboard from './components/Dashboard'; 
-import Customer from './components/Customer';   
+import Sidebar from './components/sidebar';
+import Dashboard from './components/Dashboard';
+import Customer from './components/Customer';
+import PrivateRoute from './components/PrivateRoute'; // ← PrivateRoute
 import { DarkModeProvider, DarkModeContext } from './components/DarkModeContext';
 import { LanguageProvider } from './components/LanguageContext';
 
@@ -23,7 +31,6 @@ function AppContent() {
 
   const currentPath = location.pathname.toLowerCase();
 
-  // Halaman yang tidak memakai Navbar & Footer
   const hideNavbarFooterRoutes = ['/signin', '/register', '/dashboard', '/customer'];
   const hideLayout = hideNavbarFooterRoutes.includes(currentPath);
 
@@ -34,75 +41,99 @@ function AppContent() {
     }
   }, [currentPath, navigate]);
 
-  // Layout khusus dashboard
-  if (currentPath === '/dashboard') {
-    return (
-      <div style={{ display: 'flex' }}>
-        <Sidebar />
-        <div style={{ marginLeft: '250px', padding: '20px', width: '100%' }}>   
-          <Dashboard />
-        </div>
-      </div>
-    );
-  }
+  // Dashboard layout dibungkus PrivateRoute
+              if (currentPath === '/dashboard') {
+                return (
+                  <PrivateRoute>
+                    <div style={{ display: 'flex' }}>
+                      <Sidebar />
+                      <div style={{ marginLeft: '250px', padding: '20px', width: '100%' }}>
+                        <Dashboard />
+                      </div>
+                    </div>
+                  </PrivateRoute>
+                );
+              }
 
-  if (currentPath === '/customer') {
-    return (
-      <div style={{ display: 'flex' }}>
-        <Sidebar />
-        <div style={{ marginLeft: '250px', padding: '20px', width: '100%' }}>
-          <Customer />
-        </div>
-      </div>
-    );
-  }
+  // Customer layout dibungkus PrivateRoute
+              if (currentPath === '/customer') {
+                return (
+                  <PrivateRoute>
+                    <div style={{ display: 'flex' }}>
+                      <Sidebar />
+                      <div style={{ marginLeft: '250px', padding: '20px', width: '100%' }}>
+                        <Customer />
+                      </div>
+                    </div>
+                  </PrivateRoute>
+                );
+              }
 
-  // Layout umum dengan Navbar dan Footer
-  return (
-    <div>
-      {!hideLayout && <Navbar />}
+              return (
+                <div>
+                  {!hideLayout && <Navbar />}
 
-      <Routes>
-        <Route path="/invoice" element={<InvoiceForm contentRef={invoiceRef} />} />
-        <Route path="/history" element={<History />} />
-        <Route path="/signin" element={<SignIn />} />
-        <Route path="/help" element={<Help />} />
-        <Route path="/information" element={<Information />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/" element={<InvoiceForm contentRef={invoiceRef} />} />
-      </Routes>
+                  <Routes>
+                    <Route path="/" element={<Navigate to="/signin" replace />} />
 
-      {!hideLayout && <Footer />}
-    </div>
-  );
-}
+                    <Route path="/signin" element={<SignIn />} />
+                    <Route path="/register" element={<Register />} />
 
-function App() {
-  const { darkMode } = useContext(DarkModeContext);
+                    {/* Protected Routes */}
+                    <Route path="/invoice" element={
+                      <PrivateRoute>
+                        <InvoiceForm contentRef={invoiceRef} />
+                      </PrivateRoute>
+                    } />
 
-  useEffect(() => {
-    if (darkMode) {
-      document.body.classList.add('dark-mode');
-    } else {
-      document.body.classList.remove('dark-mode');
-    }
-  }, [darkMode]);
+                    <Route path="/history" element={
+                      <PrivateRoute>
+                        <History />
+                      </PrivateRoute>
+                    } />
 
-  return (
-    <Router>
-      <AppContent />
-    </Router>
-  );
-}
+                    <Route path="/help" element={
+                      <PrivateRoute>
+                        <Help />
+                      </PrivateRoute>
+                    } />
 
-export default function AppWrapper() {
-  return (
-    <DarkModeProvider>
-      <LanguageProvider>
-        <App />
-      </LanguageProvider>
-    </DarkModeProvider>
-  );
-}
+                    <Route path="/information" element={
+                      <PrivateRoute>
+                        <Information />
+                      </PrivateRoute>
+                    } />
+                  </Routes>
 
+                  {!hideLayout && <Footer />}
+                </div>
+              );
+            }
 
+            function App() {
+              const { darkMode } = useContext(DarkModeContext);
+
+              useEffect(() => {
+                if (darkMode) {
+                  document.body.classList.add('dark-mode');
+                } else {
+                  document.body.classList.remove('dark-mode');
+                }
+              }, [darkMode]);
+
+              return (
+                <Router>
+                  <AppContent />
+                </Router>
+              );
+            }
+
+            export default function AppWrapper() {
+              return (
+                <DarkModeProvider>
+                  <LanguageProvider>
+                    <App />
+                  </LanguageProvider>
+                </DarkModeProvider>
+              );
+            }

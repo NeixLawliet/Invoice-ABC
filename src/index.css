@@ -47,3 +47,80 @@ a, button, span, div, h1, h2, h3, h4, h5, h6 {
   color: black;
   transition: color 0.5s ease, background-color 0.5s ease;
 }
+
+.invoice-container {
+  border: 1px solid #dee2e6;
+  border-radius: 10px;
+  overflow: hidden;
+  font-family: sans-serif;
+  margin-bottom: 30px;
+}
+
+.invoice-header {
+  display: grid;
+  grid-template-columns: 1fr 100px 140px 120px;
+  background-color: #800080;
+  color: white;
+  font-weight: 600;
+  padding: 12px 20px;
+}
+
+.invoice-row {
+  display: grid;
+  grid-template-columns: 1fr 100px 140px 120px;
+  gap: 10px;
+  padding: 15px 20px;
+  border-top: 1px solid #dee2e6;
+  align-items: center;
+  background-color: #fff;
+}
+
+.invoice-input {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.invoice-input.short {
+  text-align: center;
+}
+
+.invoice-rate-group {
+  display: flex;
+  align-items: center;
+}
+
+.currency-symbol {
+  background: #f1f1f1;
+  padding: 9px 12px;
+  border: 1px solid #ccc;
+  border-right: none;
+  border-radius: 6px 0 0 6px;
+  font-size: 14px;
+}
+
+.invoice-input.rate {
+  border-radius: 0 6px 6px 0;
+  border-left: none;
+}
+
+.invoice-amount {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #6c757d;
+  font-weight: 500;
+  padding-left: 8px;
+}
+
+.remove-btn {
+  background: none;
+  border: none;
+  color: #dc3545;
+  font-size: 20px;
+  margin-left: 8px;
+  cursor: pointer;
+  line-height: 1;
+}

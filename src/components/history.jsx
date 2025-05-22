@@ -21,7 +21,7 @@ function History() {
       total: 'Total',
       status: 'Status',
       action: 'Action',
-      noInvoiceData: 'No invoice data.',
+      noInvoiceData: 'No Invoice Data.',
       view: 'View',
       delete: 'Delete',
       download: 'Download',
@@ -35,9 +35,35 @@ function History() {
       deleteError: 'Error deleting invoice',
       deleteErrorAlert: 'An error occurred while deleting the invoice'
 
+    },
+    id : {
+      invoiceHistory : 'Riwayat Invoice',
+      createNewInvoice : 'Buat Invoice Baru',
+      searchCustomer : 'Cari Pelanggan',
+      search : 'Cari',
+      invoiceNumber : 'Nomor Invoice',
+      date : 'Tanggal',
+      total : 'Total',
+      status : 'Status',
+      action : 'Aksi',
+      noInvoiceData : 'Tidak Ada Data Invoice',
+      view : 'Lihat',
+      delete : 'Hapus',
+      download : 'Unduh',
+      sendToWhatsApp : 'Kirim Ke Whastsapp',
+      enterPhoneNumber : 'Masukan No Telepon',
+      close : 'Tutup',
+      send : 'Kirim',
+      confirmDelete : 'Apakah Anda Yakin Ingin Menghapus Invoice Ini?',
+      deleteSuccess : 'Invoice Berhasil Dihapus',
+      deleteFail : 'Gagal Menghapus Invoice',
+      deleteError : 'Kesalahan Saat Menghapus Invoice',
+      deleteErrorAlert : 'Terjadi Kesalahan Saat Menghapus Invoice'
     }
-    
   }
+
+  const {language} = useLanguage();
+  const t = translations[language];
 
   useEffect(() => {
     fetchInvoices();
@@ -55,14 +81,14 @@ function History() {
 
       const data = await response.json();
       setInvoices(data);
-      setFilteredInvoices(data); // Simpan juga untuk hasil filter
+      setFilteredInvoices(data);
     } catch (error) {
       console.error("Gagal mengambil data invoice:", error);
     }
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Apakah Anda yakin ingin menghapus invoice ini?")) {
+    if (window.confirm(t.confirmDelete)) {
       try {
         const token = localStorage.getItem("token");
         const response = await fetch(`http://localhost:5000/api/invoices/${id}`, {
@@ -73,14 +99,14 @@ function History() {
         });
 
         if (response.ok) {
-          alert("Invoice berhasil dihapus");
+          alert(t.deleteSuccess);
           fetchInvoices();
         } else {
-          alert("Gagal menghapus invoice");
+          alert(t.deleteFail);
         }
       } catch (error) {
-        console.error("Error menghapus invoice:", error);
-        alert("Terjadi kesalahan saat menghapus invoice");
+        console.error(t.deleteError, error);
+        alert(t.deleteErrorAlert);
       }
     }
   };
@@ -99,12 +125,12 @@ function History() {
   return (
     <div className="container mt-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2>Invoice History</h2>
+        <h2>{t.InvoiceHistory}</h2>
         <button
           className="btn btn-primary"
           onClick={() => (window.location.href = "/invoice")}
         >
-          Create New Invoice
+          {t.createNewInvoice}
         </button>
       </div>
 
@@ -113,12 +139,12 @@ function History() {
         <input
           type="text"
           className="form-control me-2"
-          placeholder="Search customer"
+          placeholder={t.searchCustomer}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
         <button className="btn btn-primary" onClick={handleSearch}>
-          Search
+          {t.search}
         </button>
       </div>
 
@@ -128,18 +154,18 @@ function History() {
             <table className="table table-hover">
               <thead className="table-light">
                 <tr>
-                  <th>Invoice Number</th>
-                  <th>Date</th>
-                  <th>Total</th>
-                  <th>Status</th>
-                  <th>Action</th>
+                  <th>{t.invoiceNumber}</th>
+                  <th>{t.date}</th>
+                  <th>{t.total}</th>
+                  <th>{t.status}</th>
+                  <th>{t.action}</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredInvoices.length === 0 ? (
                   <tr>
                     <td colSpan="5" className="text-center">
-                      Tidak ada data invoice.
+                      {t.noInvoiceData}
                     </td>
                   </tr>
                 ) : (
@@ -160,32 +186,32 @@ function History() {
                             className="btn btn-sm btn-outline-primary me-2 mb-2"
                             onClick={() => window.location.href = `/invoice/${invoice.id}`}
                           >
-                            View
+                            {t.view}
                           </button>
                           <button
                             className="btn btn-sm btn-outline-danger me-2 mb-2"
                             onClick={() => handleDelete(invoice.id)}
                           >
-                            Delete
+                            {t.delete}
                           </button>
                           <button
                             className="btn btn-sm btn-outline-success me-2 mb-2"
                             onClick={() => handleDownload(invoice.id)}
                           >
-                            Download
+                            {t.download}
                           </button>
                         <button
                           className="btn btn-sm btn-outline-info me-2 mb-2"
                           data-bs-toggle="modal"
                           data-bs-target={`#whatsappModal${invoice.id}`}
                         >
-                          Send to WhatsApp
+                          {t.sendToWhatsApp}
                         </button>
                         <div className="modal fade" id={`whatsappModal${invoice.id}`} tabIndex="-1" aria-labelledby="whatsappModalLabel" aria-hidden="true">
                           <div className="modal-dialog">
                             <div className="modal-content">
                               <div className="modal-header">
-                                <h5 className="modal-title" id="whatsappModalLabel">Send to WhatsApp</h5>
+                                <h5 className="modal-title" id="whatsappModalLabel">{t.sendToWhatsApp}</h5>
                                 <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                               </div>
                               <div className="modal-body">
@@ -193,11 +219,11 @@ function History() {
                                   type="text"
                                   className="form-control"
                                   id={`whatsappNumber${invoice.id}`}
-                                  placeholder="Enter phone number"
+                                  placeholder={t.enterPhoneNumber}
                                 />
                               </div>
                               <div className="modal-footer">
-                                <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">{t.close}</button>
                                 <button
                                   type="button"
                                   className="btn btn-primary"
@@ -206,7 +232,7 @@ function History() {
                                     window.location.href = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=Invoice ${invoice.invoice_number} telah dikirimkan.`;
                                   }}
                                 >
-                                  Send
+                                  {t.send}
                                 </button>
                               </div>
                             </div>

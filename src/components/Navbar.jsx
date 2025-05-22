@@ -131,7 +131,7 @@ function Navbar() {
                             {darkMode ? <FaSun /> : <FaMoon />}
                         </button>
                         {isLoggedIn ? (
-                            <button className="btn btn-danger btn-sm" onClick={handleLogoutClick}>
+                            <button className="btn btn-danger" onClick={handleLogoutClick}>
                                 {t.logout}
                             </button>
                         ) : (

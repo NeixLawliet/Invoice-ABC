@@ -6,11 +6,80 @@
   import "react-datepicker/dist/react-datepicker.css";
   import { useNavigate } from "react-router-dom";
   import { useLanguage } from './LanguageContext';
+  import  { useRef } from "react";
 
 
   function InvoiceForm({ contentRef }) {
     const navigate = useNavigate();
-    const { language } = useLanguage();
+
+    const translations = {
+      en : {
+        addLogo : '+Add Your Logo',
+        whoIsFrom : 'Who Is This From?',
+        billto : 'Bill To',
+        shipto : 'Ship To',
+        date : 'Date',
+        selecetDate : 'Select Date',
+        paymentterms : 'Payment Terms',
+        duedate :'Due Date',
+        ponumber : 'PO Number',
+        item : 'Item',
+        quantity : 'Quantity',
+        rate : 'Rate',
+        amount : 'Amount',
+        lineItem : '+Line Item',
+        descriptionItem : 'Description Item',
+        dIScount : 'Discount',
+        amountPaid : 'Amount Paid',
+        balanceDue : 'Balance Due',
+        submitInvoice : 'Submit Invoice',
+        pleaseFillin : 'Please fill in the items and make sure the subtotal is not zero.',
+        invoiceSaved : 'Invoice saved successfully:',
+        invoicesaved : 'Invoice Saved Successfully',
+        failedSaved : 'Failed to Save Invoce:',
+        faiLed : 'Failed',
+        defaultData : 'Default data saved successfully',
+        selectDuedate : 'Select Due Date',
+        download : 'Download',
+        saveDefault : 'Save Default',
+ 
+      },
+      id: {
+        addLogo: '+Tambah Logo Anda',
+        whoIsFrom: 'Dari Siapa Ini?',
+        billto: 'Tagih Kepada',
+        shipto: 'Kirim Kepada',
+        date: 'Tanggal',
+        selecetDate: 'Pilih Tanggal',
+        paymentterms: 'Syarat Pembayaran',
+        duedate: 'Jatuh Tempo',
+        ponumber: 'Nomor PO',
+        item: 'Item',
+        quantity: 'Kuantitas',
+        rate: 'Harga',
+        amount: 'Jumlah',
+        lineItem: '+Item Baru',
+        descriptionItem: 'Deskripsi Item',
+        dIScount: 'Diskon',
+        amountPaid: 'Jumlah Dibayar',
+        balanceDue: 'Sisa Tagihan',
+        submitInvoice: 'Kirim Invoice',
+        pleaseFillin: 'Harap isi item dan pastikan subtotal tidak nol.',
+        invoiceSaved: 'Invoice berhasil disimpan:',
+        invoicesaved: 'Invoice Berhasil Disimpan',
+        failedSaved: 'Gagal Menyimpan Invoice:',
+        faiLed: 'Gagal',
+        defaultData: 'Data default berhasil disimpan',
+        selectDuedate: 'Pilih Tanggal Jatuh Tempo',
+        download: 'Unduh',
+        saveDefault: 'Simpan Default',
+        confirmInvoice: 'Konfirmasi Invoice'
+      }
+    };
+    const {language} = useLanguage();
+    const t = translations[language];
+
+   
 
     // State untuk form fields
     const [logo, setLogo] = useState(null);
@@ -88,7 +157,7 @@
       e.preventDefault(); // Mencegah reload halaman saat form disubmit
 
       if (items.length === 0 || subtotal === 0) {
-        alert("Harap isi item dan pastikan subtotal tidak nol.");
+        alert(t.pleaseFillin);
         return;
       }
 
@@ -129,12 +198,12 @@
         try {
           const data = JSON.parse(text); // Mengonversi respons menjadi JSON
           if (response.ok) {
-            console.log("Invoice berhasil disimpan:", data);
-            alert("Invoice berhasil disimpan");
+            console.log(t.invoiceSaved, data);
+            alert(t.invoicesaved);
             navigate("/history");
           } else {
-            console.error("Gagal menyimpan invoice:", data);
-            alert(`Gagal: ${data.message}`);
+            console.error(t.failedSaved, data);
+            alert(`${t.failedSaved} ${data.message}`);
           }
         } catch (err) {
           console.error("Gagal mengonversi respons ke JSON:", err);
@@ -149,16 +218,18 @@
     };
 
     // Handle PDF download
-    const handleDownload = () => {
-      const input = contentRef.current;
-      html2canvas(input).then((canvas) => {
-        const imgData = canvas.toDataURL("image/png");
-        const pdf = new jsPDF("p", "mm", "a4");
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-        pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-        pdf.save("invoice.pdf");
-      });
+    const previewRef = useRef(null);
+    const handleDownload = async () => {
+      const element = previewRef.current;
+      const canvas = await html2canvas(element);
+      const imgData = canvas.toDataURL('image/png');
+    
+      const pdf = new jsPDF('p', 'pt', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+    
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`Invoice-${invoiceNumber || 'no-number'}.pdf`);
     };
 
     useEffect(() => {
@@ -179,7 +250,7 @@
         discount,
       };
       localStorage.setItem("invoiceDefaults", JSON.stringify(defaults));
-      alert("Data default berhasil disimpan.");
+      alert(t.defaultData);
     };
     
 
@@ -200,7 +271,7 @@
                       style={{ maxHeight: "100%", maxWidth: "100%" }}
                     />
                   ) : (
-                    <span className="text-justify">+Add Your Logo</span>
+                    <span className="text-justify">{t.addLogo}</span>
                   )}
                   <input
                     type="file"
@@ -213,7 +284,7 @@
                 <input
                   type="text"
                   className="form-control mt-2"
-                  placeholder="Who is this from?"
+                  placeholder={t.whoIsFrom}
                   value={from}
                   onChange={(e) => setFrom(e.target.value)}
                 />
@@ -231,18 +302,18 @@
                 </div>
                 <div className="d-flex flex-column gap-2 mt-5 pt-5">
                   <div className="d-flex justify-content-between align-items-center" style={{ width: '100%', marginLeft: 'auto' }}>
-                    <label className="me-3 text-end ms-auto">Date</label>
+                    <label className="me-3 text-end ms-auto">{t.date}</label>
                     <DatePicker
                       selected={invoiceDate}
                       onChange={(date) => setInvoiceDate(date)}
                       className="form-control"
                       dateFormat="dd/MM/yyyy"
-                      placeholderText="Select date"
+                      placeholderText={t.selecetDate}
                       style={{ width: '100%' }}
                     />
                   </div>
                   <div className="d-flex justify-content-between align-items-center">
-                    <label className="me-3 text-end ms-auto">Payment Terms</label>
+                    <label className="me-3 text-end ms-auto">{t.paymentterms}</label>
                     <input
                       type="text"
                       className="form-control"
@@ -252,18 +323,18 @@
                     />
                   </div>
                   <div className="d-flex justify-content-between align-items-center">
-                    <label className="me-3 text-end ms-auto" >Due Date</label>
+                    <label className="me-3 text-end ms-auto" >{t.duedate}</label>
                     <DatePicker
                       selected={dueDate}
                       onChange={(date) => setDueDate(date)}
                       className="form-control"
                       dateFormat="dd/MM/yyyy"
-                      placeholderText="Select due date"
+                      placeholderText={t.selectDuedate}
                       style={{ width: '100%' }}
                     />
                   </div>
                   <div className="d-flex justify-content-between align-items-center">
-                    <label className="me-3 text-end ms-auto">PO Number</label>
+                    <label className="me-3 text-end ms-auto">{t.ponumber}</label>
                     <input
                       type="text"
                       className="form-control"
@@ -279,7 +350,7 @@
             <div className="row mb-3">
 
             <div className="col-md-4">
-                <label>Bill To</label>
+                <label>{t.billto}</label>
                 <input
                   type="text"
                   className="form-control"
@@ -290,7 +361,7 @@
               </div>
 
               <div className="col-md-4">
-                <label>Ship To</label>
+                <label>{t.shipto}</label>
                 <input
                   type="text"
                   className="form-control"
@@ -301,77 +372,58 @@
               </div>
             </div>
 
-            <table className="table table-bordered">
-              <thead style={{ backgroundColor: "#a000c8", color: "white" }}>
-                <tr>
-                  <th>Item</th>
-                  <th>Quantity</th>
-                  <th>Rate</th>
-                  <th>Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                {items.map((item, index) => (
-                  <tr key={index}>
-                    <td>
-                      <input
-                        type="text"
-                        className="form-control"
-                        value={item.description}
-                        onChange={(e) =>
-                          handleItemChange(index, "description", e.target.value)
-                        }
-                        placeholder="Description of item"
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="number"
-                        className="form-control"
-                        value={item.quantity}
-                        onChange={(e) =>
-                          handleItemChange(index, "quantity", e.target.value)
-                        }
-                      />
-                    </td>
-                    <td>
-                      <div className="input-group">
-                        <span className="input-group-text">{getCurrencySymbol(currency)}</span>
-                        <input
-                          type="number"
-                          className="form-control"
-                          value={item.rate}
-                          onChange={(e) =>
-                            handleItemChange(index, "rate", e.target.value)
-                          }
-                        />
-                      </div>
-                    </td>
-                    <td>
-                      <span>
-                        {getCurrencySymbol(currency)}{" "}
-                        {calculateAmount(item.quantity, item.rate).toLocaleString()}
-                      </span>
-                      <button
-                        type="button"
-                        className="btn btn-sm btn-danger ms-2"
-                        onClick={() => handleRemoveItem(index)}
-                      >
-                        &times;
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <div className="invoice-container" style={{ marginTop: '24px' }}>
+              <div className="invoice-header">
+                <div>{t.item}</div>
+                <div>{t.quantity}</div>
+                <div>{t.rate}</div>
+                <div>{t.amount}</div>
+              </div>
+
+              {items.map((item, index) => (
+                <div className="invoice-row" key={index}>
+                  <input
+                    type="text"
+                    className="invoice-input"
+                    placeholder={t.descriptionItem}
+                    value={item.description}
+                    onChange={(e) => handleItemChange(index, "description", e.target.value)}
+                  />
+                  <input
+                    type="number"
+                    className="invoice-input short"
+                    value={item.quantity}
+                    onChange={(e) => handleItemChange(index, "quantity", e.target.value)}
+                  />
+                  <div className="invoice-rate-group">
+                    <span className="currency-symbol">{getCurrencySymbol(currency)}</span>
+                    <input
+                      type="number"
+                      className="invoice-input rate"
+                      value={item.rate}
+                      onChange={(e) => handleItemChange(index, "rate", e.target.value)}
+                    />
+                  </div>
+                  <div className="invoice-amount">
+                    {getCurrencySymbol(currency)}{" "}
+                    {calculateAmount(item.quantity, item.rate).toLocaleString()}
+                    <button className="remove-btn" onClick={() => handleRemoveItem(index)}>
+                      &times;
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+
 
             <button
               type="button"
-              className="btn btn-outline-primary mb-3"
+              className="btn btn-outline-primary mt-3 mb-3"
               style={{ borderColor: "#a000c8", color: "#a000c8" }}
               onClick={handleAddItem}
             >
-              + Line Item
+              {t.lineItem}
             </button>
 
             <div className="col-md-6 ms-auto">
@@ -390,7 +442,7 @@
               </div>
 
               <div className="d-flex justify-content-between align-items-center mb-2">
-                <span>Diskon</span>
+                <span>{t.dIScount}</span>
                 <div className="input-group" style={{ width: "150px" }}>
                   <input
                     type="number"
@@ -408,7 +460,7 @@
               </div>
 
               <div className="d-flex justify-content-between align-items-center mb-2">
-                <span>Amount Paid</span>
+                <span>{t.amountPaid}</span>
                 <div className="input-group" style={{ width: "150px" }}>
                   <span className="input-group-text">{getCurrencySymbol(currency)}</span>
                   <input type="number" className="form-control" defaultValue={0} />
@@ -416,7 +468,7 @@
               </div>
 
               <div className="d-flex justify-content-between">
-                <span>Balance Due</span>
+                <span>{t.balanceDue}</span>
                 <span>
                   {getCurrencySymbol(currency)} {total.toLocaleString()}
                 </span>
@@ -425,22 +477,168 @@
 
             <div className="d-flex justify-content-end mt-3">
               <button type="submit" className="btn btn-primary">
-                Submit Invoice
+                {t.submitInvoice}
               </button>
             </div>
           </form>
+          <div
+  ref={previewRef}
+  style={{ position: "absolute", top: "-9999px", left: "-9999px" }}
+>
+  <div className="p-4 border" style={{ width: "800px", background: "white" }}>
+    {/* Header section */}
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "flex-start",
+      }}
+    >
+      {/* Logo & From */}
+      <div style={{ width: "50%" }}>
+        <div style={{ width: "200px", height: "100px", marginBottom: "8px" }}>
+          {logo && (
+            <img
+              src={logo}
+              alt="Logo"
+              style={{
+                maxWidth: "100%",
+                maxHeight: "100%",
+                objectFit: "contain",
+              }}
+            />
+          )}
+        </div>
+        <p style={{ margin: 0 }}>
+          {from}
+        </p>
+      </div>
+
+      {/* Invoice Info */}
+      <div style={{ textAlign: "right", width: "50%" }}>
+        <h2 style={{ marginBottom: "8px" }}>INVOICE</h2>
+
+        {invoiceNumber && (
+          <p style={{ margin: 0 }}>
+            <strong>#</strong> {invoiceNumber}
+          </p>
+        )}
+        <p className="align-right">
+          <strong>Invoice Date:</strong>{" "}
+          {invoiceDate ? invoiceDate.toLocaleDateString() : "-"}
+        </p>
+        <p className="align-right">
+          <strong>Payment Terms:</strong> {paymentTerms || "-"}
+        </p>
+        <p className="align-right">
+          <strong>Due Date:</strong>{" "}
+          {dueDate ? dueDate.toLocaleDateString() : "-"}
+        </p>
+        <p className="align-right">
+          <strong>PO Number:</strong> {poNumber || "-"}
+        </p>
+      </div>
+    </div>
+
+    {/* Bill To / Ship To */}
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        marginTop: "24px",
+      }}
+    >
+      <div style={{ width: "48%" }}>
+        <p style={{ margin: 0 }}>
+          <strong>Bill To:</strong>
+        </p>
+        <p>{billTo}</p>
+      </div>
+      <div style={{ width: "48%", textAlign: "left" }}>
+        <p style={{ margin: 0 }}>
+          <strong>Ship To:</strong>
+        </p>
+        <p>{shipTo}</p>
+      </div>
+    </div>
+
+    {/* Table */}
+    <table
+      style={{
+        width: "100%",
+        borderCollapse: "collapse",
+        marginTop: "16px",
+        fontSize: "14px",
+      }}
+    >
+      <thead>
+        <tr style={{ backgroundColor: "#800080", color: "white" }}>
+          <th style={{ padding: "8px", border: "1px solid #ddd" }}>{t.item}</th>
+          <th style={{ padding: "8px", border: "1px solid #ddd" }}>{t.quantity}</th>
+          <th style={{ padding: "8px", border: "1px solid #ddd" }}>{t.rate}</th>
+          <th style={{ padding: "8px", border: "1px solid #ddd" }}>{t.amount}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {items.map((item, i) => (
+          <tr key={i}>
+            <td style={{ padding: "8px", border: "1px solid #ddd" }}>
+              {item.description}
+            </td>
+            <td
+              style={{
+                padding: "8px",
+                border: "1px solid #ddd",
+                textAlign: "center",
+              }}
+            >
+              {item.quantity}
+            </td>
+            <td style={{ padding: "8px", border: "1px solid #ddd" }}>
+              {getCurrencySymbol(currency)} {item.rate}
+            </td>
+            <td style={{ padding: "8px", border: "1px solid #ddd" }}>
+              {getCurrencySymbol(currency)}{" "}
+              {calculateAmount(item.quantity, item.rate).toLocaleString()}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+
+    {/* Totals */}
+    <div style={{ textAlign: "right", marginTop: "20px" }}>
+      <p>
+        <strong>Subtotal:</strong> {getCurrencySymbol(currency)}{" "}
+        {subtotal.toLocaleString()}
+      </p>
+      <p>
+        <strong>Total:</strong> {getCurrencySymbol(currency)}{" "}
+        {total.toLocaleString()}
+      </p>
+      <p>
+        <strong>{t.dIScount}:</strong> {discount}%
+      </p>
+      <p>
+        <strong>{t.balanceDue}:</strong> {getCurrencySymbol(currency)}{" "}
+        {total.toLocaleString()}
+      </p>
+    </div>
+  </div>
+</div>
+
         </div>
 
         <div
           className="d-flex flex-column align-items-start mt-5 me-3"
           style={{ width: "200px" }}
         >
-          <button 
+         <button 
             type="button"
             className="btn btn-success w-100 mb-2" 
             onClick={handleDownload}
           >
-            Download
+            {t.download}
           </button>
 
           <select
@@ -463,7 +661,7 @@
             className="btn btn-success w-100"
             onClick={handleSaveDefault}
           >
-            Save Default
+            {t.saveDefault}
           </button>
 
         </div>

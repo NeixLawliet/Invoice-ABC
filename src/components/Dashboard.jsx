@@ -1,5 +1,5 @@
 // src/components/Dashboard.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, Row, Col, Table } from 'react-bootstrap';
 import { Bar, Line, Pie } from 'react-chartjs-2';
 import {
@@ -26,77 +26,136 @@ ChartJS.register(
 );
 
 const Dashboard = () => {
-  // Data KPI
-  const kpiData = [
-    { title: 'Total Invoice', value: 1200 },
-    { title: 'Total New User', value: 350 },
-    { title: 'Unpaid Invoice', value: 75 },
-  ];
-
-  // Data grafik contoh
-  const barData = {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'],
-    datasets: [
-      {
-        label: 'Monthly Invoice',
-        data: [100, 150, 120, 170, 160, 190],
-        backgroundColor: 'rgba(75,192,192,0.6)',
-      },
-    ],
-  };
-
-  const lineData = {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'],
-    datasets: [
-      {
-        label: 'New User',
-        data: [20, 40, 35, 50, 45, 60],
-        fill: false,
-        borderColor: 'rgba(153,102,255,1)',
-        tension: 0.1,
-      },
-    ],
-  };
-
-  const pieData = {
-    labels: ['Paid', 'Unpaid'],
-    datasets: [
-      {
-        label: 'Invoice Status',
-        data: [1125, 75],
-        backgroundColor: ['#36A2EB', '#FF6384'],
-        hoverOffset: 4,
-      },
-    ],
-  };
-
-  // Data tabel
-  const tableData = [
-    { id: 1, customer: 'John Doe', invoice: 'INV-001', amount: 500, status: 'Lunas' },
-    { id: 2, customer: 'Jane Smith', invoice: 'INV-002', amount: 300, status: 'Belum Bayar' },
-    { id: 3, customer: 'Mark Johnson', invoice: 'INV-003', amount: 450, status: 'Lunas' },
-  ];
-
-  // State untuk search
+  const [kpiData, setKpiData] = useState([]);
+  const [barData, setBarData] = useState(null);
+  const [lineData, setLineData] = useState(null);
+  const [pieData, setPieData] = useState(null);
+  const [tableData, setTableData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filteredData, setFilteredData] = useState(tableData);
+
+  const token = localStorage.getItem("token");
+
+  const fetchKpiData = async () => {
+    try {
+      const res = await fetch("http://192.168.100.72:5000/api/dashboard/kpi", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await res.json();
+      console.log('KPI API Response:', data);
+      setKpiData([
+        { title: "Total Invoice", value: data.totalInvoice },
+        { title: "Unpaid Invoice", value: data.unpaidInvoice },
+        { title: "Total New Customer", value: data.totalNewCustomer }
+      ]);      
+    } catch (error) {
+      console.error("Gagal fetch KPI:", error);
+    }
+  };
+  
+
+  const fetchChartData = async () => {
+    try {
+      const res = await fetch("http://192.168.100.72:5000/api/dashboard/chart", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      const data = await res.json();
+  
+      // Mapping bar chart (Monthly Invoice)
+      const invoiceMonths = data.monthlyInvoice.map((item) => `Bulan ${item.month}`);
+      const invoiceTotals = data.monthlyInvoice.map((item) => item.total);
+  
+      const barChartData = {
+        labels: invoiceMonths,
+        datasets: [
+          {
+            label: 'Total Invoice',
+            data: invoiceTotals,
+            backgroundColor: 'rgba(75, 192, 192, 0.6)',
+          },
+        ],
+      };
+  
+      // Mapping line chart (Monthly New Customers)
+      const customerMonths = data.monthlyCustomers.map((item) => `Bulan ${item.month}`);
+      const customerTotals = data.monthlyCustomers.map((item) => item.total);
+  
+      const lineChartData = {
+        labels: customerMonths,
+        datasets: [
+          {
+            label: 'New Customers',
+            data: customerTotals,
+            fill: false,
+            borderColor: 'rgba(153, 102, 255, 1)',
+            tension: 0.3,
+          },
+        ],
+      };
+  
+      // Mapping pie chart (Invoice Status)
+      const statusLabels = data.invoiceStatus.map((item) => item.status);
+      const statusTotals = data.invoiceStatus.map((item) => item.total);
+  
+      const pieChartData = {
+        labels: statusLabels,
+        datasets: [
+          {
+            data: statusTotals,
+            backgroundColor: ['#FF6384', '#FFCE56', '#36A2EB'],
+          },
+        ],
+      };
+  
+      setBarData(barChartData);
+      setLineData(lineChartData);
+      setPieData(pieChartData);
+    } catch (error) {
+      console.error("Gagal fetch Chart:", error);
+    }
+  };
+  
+
+  const fetchInvoiceTable = async () => {
+    try {
+      const res = await fetch("http://192.168.100.72:5000/api/dashboard/table", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await res.json();
+      setTableData(data);
+      setFilteredData(data);
+    } catch (error) {
+      console.error("Gagal fetch Table:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchKpiData();
+    fetchChartData();
+    fetchInvoiceTable();
+  }, []);
 
   const handleSearch = (e) => {
     const value = e.target.value.toLowerCase();
     setSearchTerm(value);
-
     const filtered = tableData.filter(
       (row) =>
         row.customer.toLowerCase().includes(value) ||
-        row.invoice.toLowerCase().includes(value) ||
+        row.invoice_number.toLowerCase().includes(value) ||
         row.status.toLowerCase().includes(value)
     );
-
     setFilteredData(filtered);
   };
 
   return (
-     <div className="main-content">
+    <div className="main-content">
       <h4>Dashboard</h4>
 
       {/* KPI Cards */}
@@ -120,7 +179,7 @@ const Dashboard = () => {
             <Card.Body>
               <Card.Title>Monthly Invoice</Card.Title>
               <div style={{ height: '250px' }}>
-                <Bar data={barData} options={{ maintainAspectRatio: false }} />
+                {barData && <Bar data={barData} options={{ maintainAspectRatio: false }} />}
               </div>
             </Card.Body>
           </Card>
@@ -129,9 +188,9 @@ const Dashboard = () => {
         <Col md={4}>
           <Card className="shadow-sm mb-3">
             <Card.Body>
-              <Card.Title>New User Monthly</Card.Title>
+              <Card.Title>New Customer Monthly</Card.Title>
               <div style={{ height: '250px' }}>
-                <Line data={lineData} options={{ maintainAspectRatio: false }} />
+                {lineData && <Line data={lineData} options={{ maintainAspectRatio: false }} />}
               </div>
             </Card.Body>
           </Card>
@@ -140,9 +199,9 @@ const Dashboard = () => {
         <Col md={4}>
           <Card className="shadow-sm mb-3">
             <Card.Body>
-              <Card.Title>Invoice Status</Card.Title>
+              <Card.Title>Status Invoice</Card.Title>
               <div style={{ height: '250px' }}>
-                <Pie data={pieData} options={{ maintainAspectRatio: false }} />
+                {pieData && <Pie data={pieData} options={{ maintainAspectRatio: false }} />}
               </div>
             </Card.Body>
           </Card>
@@ -157,7 +216,7 @@ const Dashboard = () => {
             <input
               type="text"
               className="form-control"
-              placeholder="Search by customer, invoice, or status"
+              placeholder="Cari berdasarkan customer, invoice, atau status"
               value={searchTerm}
               onChange={handleSearch}
             />
@@ -178,7 +237,7 @@ const Dashboard = () => {
                 <tr key={row.id}>
                   <td>{row.id}</td>
                   <td>{row.customer}</td>
-                  <td>{row.invoice}</td>
+                  <td>{row.invoice_number}</td>
                   <td>${row.amount}</td>
                   <td>{row.status}</td>
                 </tr>
